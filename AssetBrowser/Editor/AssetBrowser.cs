@@ -773,7 +773,10 @@ public class AssetBrowser : EditorWindow
         if (!createMaterials)
             return;
 
-        Debug.Log("Path: " + path + "\nname: " + textureName);
+        //Debug.Log("Path: " + path + "\nname: " + textureName);
+
+        if (AssetDatabase.LoadAssetAtPath(path + ".mat", typeof(Material)) != null)
+            AssetDatabase.DeleteAsset(path + ".mat");
 
         var material = new Material(Shader.Find("Standard"));
         AssetDatabase.CreateAsset(material, path + ".mat");
