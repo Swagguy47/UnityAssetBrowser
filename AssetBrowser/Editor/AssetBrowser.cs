@@ -613,6 +613,7 @@ public class AssetBrowser : EditorWindow
         }
     }
 
+    //  download the preview image to BrowserCache
     IEnumerator FetchImage(string url, string shortName)
     {
         UnityWebRequest web = UnityWebRequestTexture.GetTexture(url);
@@ -713,10 +714,11 @@ public class AssetBrowser : EditorWindow
 
                         String entryFileName = zipEntry.Name;
 
+                        //  base texture name without any spaces or words in parentheses
                         string texName = outputPath.Substring(workDir.Length + 1 + "/AmbientCG".Length).Replace(" ", "").Split("(")[0];
 
-                        // Skip .DS_Store files (these appear on OSX)
-                        if (entryFileName.Contains("DS_Store"))
+                        // Files to skip when unzipping
+                        if (entryFileName.Contains("DS_Store")) //OSX
                             continue;
                         if (entryFileName.Contains("usdc"))
                             continue;
@@ -724,7 +726,7 @@ public class AssetBrowser : EditorWindow
                             continue;
                         if (entryFileName.Contains("NormalDX")) //  unity uses OpenGL format normals (I think)
                             continue;
-                        if(entryFileName ==  texName + ".png")
+                        if(entryFileName ==  texName + ".png") // preview icon
                         {
                             shortTexName = texName;
                             continue;
@@ -773,20 +775,25 @@ public class AssetBrowser : EditorWindow
         if (!createMaterials)
             return;
 
-        //Debug.Log("Path: " + path + "\nname: " + textureName);
-
+        //  if material already exists, delete it and remake
         if (AssetDatabase.LoadAssetAtPath(path + ".mat", typeof(Material)) != null)
             AssetDatabase.DeleteAsset(path + ".mat");
 
+        //  create material
         var material = new Material(Shader.Find("Standard"));
         AssetDatabase.CreateAsset(material, path + ".mat");
         Material mat = (Material)AssetDatabase.LoadAssetAtPath(path + ".mat", typeof(Material));
 
+        //  set shader
         mat.shader = matShader;
+        //  arbitrary smoothness value
         mat.SetFloat("_Glossiness", 0.3f);
 
+        //  essential so textures can be loaded
         AssetDatabase.Refresh();
 
+        //  check for each texture map type, if exists, assign it
+        //  TODO: Refactor, two LoadAssetAtPath's per map is plain stupid
         if (AssetDatabase.LoadAssetAtPath(path + "/" + textureName + "_1K-JPG_Color" + ".jpg", typeof(Texture2D)) != null)
         {
             mat.mainTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(path + "/" + textureName + "_1K-JPG_Color" + ".jpg", typeof(Texture2D));
@@ -818,6 +825,9 @@ public class AssetBrowser : EditorWindow
 
         if (AssetDatabase.LoadAssetAtPath(path + "/" + textureName + "_1K-JPG_Emission" + ".jpg", typeof(Texture2D)) != null)
         {
+            mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", Color.white * 1.5f);
             mat.SetTexture("_EmissionMap", (Texture2D)AssetDatabase.LoadAssetAtPath(path + "/" + textureName + "_1K-JPG_Emission" + ".jpg", typeof(Texture2D)));
         }
 
