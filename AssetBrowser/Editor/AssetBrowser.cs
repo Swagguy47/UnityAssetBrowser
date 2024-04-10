@@ -218,7 +218,7 @@ public class AssetBrowser : EditorWindow
             startup = false;
         }
         GUILayout.Space(15);
-        GUILayout.Label("( V.0.7 )");
+        GUILayout.Label("( V.0.8 )");
         GUILayout.Label("WORK IN PROGRESS\nSome features are currently unfinished.\nCheck for updates or help with development here:");
         if (GUILayout.Button("Github Page"))
         {
@@ -666,6 +666,17 @@ public class AssetBrowser : EditorWindow
     //  gets selected folder
     string GetSelectedFolder()
     {
+        var Getpath = "";
+        var obj = Selection.activeObject;
+        if (obj == null) Getpath = "Assets";
+        else Getpath = AssetDatabase.GetAssetPath(obj.GetInstanceID());
+        if (Getpath.Length > 0)
+        {
+            if (Directory.Exists(Getpath))
+            {
+                return Getpath;
+            }
+        }
         return null;
     }
 
