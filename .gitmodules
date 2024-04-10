@@ -1,0 +1,3 @@
+[submodule "AssetBrowser/Editor/Plugins/SharpZipLib"]
+	path = AssetBrowser/Editor/Plugins/SharpZipLib
+	url = https://github.com/icsharpcode/SharpZipLib.git
