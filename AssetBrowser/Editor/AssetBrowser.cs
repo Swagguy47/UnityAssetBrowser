@@ -344,7 +344,10 @@ public class AssetBrowser : EditorWindow
 
             _content = new GUIContent(tex.width == 1 ? asset.name : "", tex, asset.name); // file name in the resources folder without the (.png) extension
             if (GUI.Button(rect, _content)) { //(Texture2D)AssetDatabase.LoadAssetAtPath("BrowserCache/" + asset.download + ".jpg", typeof(Texture2D))
-                ImportAsset(asset.download, asset.name);
+                if (Event.current.button == 1)  // right click to open url
+                    Application.OpenURL(asset.download);
+                else   //   left click to import automatically
+                    ImportAsset(asset.download, asset.name);
             }
 
             i++;
